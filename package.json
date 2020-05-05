@@ -11,7 +11,7 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
   },
-  "homepage": "https://github.com/glevon/das2",
+  "homepage": "https://glevon.github.io/das2",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
