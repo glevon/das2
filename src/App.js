@@ -1,5 +1,10 @@
 import React from 'react';
 import './App.css';
+import {BrowserRouter as Router,Route,Link} from "react-router-dom"
+import Products from './components/Products';
+import Cart from './components/Cart';
+import Totalsum from './components/Totalsum';
+
 
 class App extends React.Component {
   constructor(){
@@ -8,7 +13,7 @@ class App extends React.Component {
       products:[
         {
           id:101,
-          name:"prd1",
+          name:"prod1",
           image:"./images/1.png", 
           price:450,
           count:12,
@@ -46,10 +51,10 @@ class App extends React.Component {
     sum:0,
     }
   }
-  addCart(item,i){
+  addCart=(item,i)=>{
     if(this.state.products[i].count>0){
         let prod =Object.assign({quantity:1},this.state.products[i])
-      let k = this.state.cart.find(x=>{
+        let k = this.state.cart.find(x=>{
         return x.id === this.state.products[i].id
       })
       if(k){
@@ -66,30 +71,26 @@ class App extends React.Component {
     }
     this.sum()
   }
-  sum(){
+  sum=()=>{
     let s=0
     this.state.cart.forEach(item=>{
       s+=item.quantity*item.price
     })
     this.state.sum=s
     this.setState({})
-  //   this.setState({
-  //     sum:s
-  //   })
     }
-  minus(q){
+  minus=(q)=>{
     if (q.quantity>1){
       q.quantity--
     }
     else{
       this.state.cart.splice(this.state.cart.indexOf(q),1)
-      // this.state.cart.splice(q,1)
     }
     this.state.products.find(o => o.id === q.id).count++
     this.sum()
     this.setState({})
   }
-  plus(q){
+  plus=(q)=>{
     if (this.state.products.find(o => o.id === q.id).count>0){
       q.quantity++
       this.state.products.find(o => o.id === q.id).count--
@@ -100,104 +101,35 @@ class App extends React.Component {
     this.sum()
     this.setState({})
   }
-  delete(q){
-    console.log(q)
+  delete=(q)=>{
     this.state.products.find(o => o.id === q.id).count+=q.quantity
     this.state.cart.splice(this.state.cart.indexOf(q),1)
-    // this.state.cart.splice(q,1)
     this.sum()
     this.setState({})
   }
 
   render(){
-    return (
-      <div className="row">
-        <div className="col-8">
-          <h1>Products</h1>
-          {
-            this.state.products.map((item, index)=>(
-              <div key={index} className="card" style={{ height:"285px", width:"200px", float :"left"}}>
-                <img className="card-img-top" src={item.image} alt={item.name} style={{ height:"150px"}} ></img>
-                <div>
-                  <h4 className="card-name">{item.name}</h4>
-                  <h5 className="card-name">{item.price}</h5>
-                  <h6 className="card-name" style={{color:item.count==0?"red":""}} >{item.count}</h6>
-                </div>
-                <button onClick={this.addCart.bind(this,item,index)} className = "btn btn-outline-warning">Add to cart</button>
-              </div>
-            ))
-          }
-        </div>
-        <div className="col-3">
-          <h1>Cart</h1>
-          <table className="table table-hover">
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody> 
-              {
-                this.state.cart.map((a, i)=>(
-                  <tr key ={a.id}>
-                  <td>
-                  <img alt={a.name} src={a.image} style={{height:"60px",width:"60px"}}></img>
-                  </td>
-                  <td>
-                    {a.name}
-                  </td>
-                  <td>
-                    {a.price}
-                  </td>
-                  <td>
-                    {a.quantity}
-                  </td>
-                  <button className="btn btn-primary" onClick= {this.minus.bind(this,a)}>-</button>
-                  <button className="btn btn-success" onClick= {this.plus.bind(this,a)}>+</button>
-                  <button className="btn btn-danger" onClick= {this.delete.bind(this,a)} >Delete</button>
-                  </tr>
-                ))
-              }
-            
-            </tbody>
-
-          </table>
-          <h3><i>Total sum:{this.state.sum}</i></h3>
-        </div>
-
-      </div>
+    return ( 
+      <Router>
+        <nav className="navbar navbar-expand-sm bg-light">
+        <ul className="navbar-nav">
+          <li className="nav-item">
+            <Link className="nav-link" to="/shop">Products</Link>
+          </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/cart">Cart</Link>
+          </li>
+          <li className="nav-item">
+            <Totalsum state={this.state} sum={this.sum}/>
+          </li>
+        </ul>
+        </nav>
+          <Route path="/shop" exact render={(props)=>(<Products state={this.state} sum={this.sum} addCart={this.addCart} />)} />
+          <Route path="/cart" render={(props)=>(<Cart  state={this.state} sum={this.sum} minus={this.minus} plus={this.plus} delete={this.delete} />)} />
+    </Router>
     )
   }
 
 }
 
-// class App extends React.Component {
-//   constructor(){
-//     super()
-//     this.state={
-//       name:""
-
-//     }
-//   }
-//   change(e){
-//     this.state.name =e.target.value
-//     this.setState({})
-
-//   }
-//   barev(){
-//     console.log(`barev ${this.state.name}`)
-//   }
-//   render(){
-//     return(
-//       <div>
-//         <input type="text" value={this.state.name} onChange ={this.change.bind(this)}></input>
-//         <button onClick ={this.barev.bind(this)}>ok</button>
-//       </div>
-//     )
-//   }
-// }
 export default App;
